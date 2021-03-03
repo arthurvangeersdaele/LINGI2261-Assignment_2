@@ -11,10 +11,12 @@ goal_state = None
 class Blocks(Problem):
 
     def successor(self, state):
-        pass
+        cur_pos = state.position
+        successors = []
+        
 
     def goal_test(self, state):
-        pass
+        
 
 
 ###############
@@ -61,7 +63,7 @@ def heuristic(node):
 ##############################
 #Use this block to test your code in local
 # Comment it and uncomment the next one if you want to submit your code on INGInious
-'''instances_path = "instances/"
+instances_path = "instances/"
 instance_names = ['a01','a02','a03','a04','a05','a06','a07','a08','a09','a10','a11']
 
 for instance in [instances_path + name for name in instance_names]:
@@ -86,34 +88,34 @@ for instance in [instances_path + name for name in instance_names]:
     print("* Execution time:\t", str(endTime - startTime))
     print("* Path cost to goal:\t", node.depth, "moves")
     print("* #Nodes explored:\t", nb_explored)
-    print("* Queue size at goal:\t",  remaining_nodes)'''
+    print("* Queue size at goal:\t",  remaining_nodes)
 
 
 
-####################################
-# Launch the search for INGInious  #
-####################################
-#Use this block to test your code on INGInious
-instance = sys.argv[1]
-grid_init, grid_goal = readInstanceFile(instance)
-init_state = State(grid_init)
-goal_state = State(grid_goal)
-problem = Blocks(init_state)
+# ####################################
+# # Launch the search for INGInious  #
+# ####################################
+# #Use this block to test your code on INGInious
+# instance = sys.argv[1]
+# grid_init, grid_goal = readInstanceFile(instance)
+# init_state = State(grid_init)
+# goal_state = State(grid_goal)
+# problem = Blocks(init_state)
 
-# example of bfs graph search
-startTime = time.perf_counter()
-node, nb_explored, remaining_nodes = astar_graph_search(problem, heuristic)
-endTime = time.perf_counter()
+# # example of bfs graph search
+# startTime = time.perf_counter()
+# node, nb_explored, remaining_nodes = astar_graph_search(problem, heuristic)
+# endTime = time.perf_counter()
 
-# example of print
-path = node.path()
-path.reverse()
+# # example of print
+# path = node.path()
+# path.reverse()
 
-print('Number of moves: ' + str(node.depth))
-for n in path:
-    print(n.state)  # assuming that the __str__ function of state outputs the correct format
-    print()
-print("* Execution time:\t", str(endTime - startTime))
-print("* Path cost to goal:\t", node.depth, "moves")
-print("* #Nodes explored:\t", nb_explored)
-print("* Queue size at goal:\t",  remaining_nodes)
+# print('Number of moves: ' + str(node.depth))
+# for n in path:
+#     print(n.state)  # assuming that the __str__ function of state outputs the correct format
+#     print()
+# print("* Execution time:\t", str(endTime - startTime))
+# print("* Path cost to goal:\t", node.depth, "moves")
+# print("* #Nodes explored:\t", nb_explored)
+# print("* Queue size at goal:\t",  remaining_nodes)
