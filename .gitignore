@@ -1,2 +1,6 @@
 
 .idea/
+
+.run/
+
+__pycache__/

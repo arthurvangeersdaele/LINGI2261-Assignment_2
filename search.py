@@ -125,11 +125,11 @@ def graph_search(problem, fringe):
         node = fringe.pop()
         exploredNodes += 1
         if problem.goal_test(node.state): 
-            return node,exploredNodes, len(fringe)
+            return node, exploredNodes, len(fringe)
         if node.state not in closed:
             closed[node.state] = True
             fringe.extend(node.expand(problem, closed))    
-    return None,exploredNodes, len(fringe)
+    return None, exploredNodes, len(fringe)
 
 def breadth_first_graph_search(problem):
     "Search the shallowest nodes in the search tree first. [p 74]"
