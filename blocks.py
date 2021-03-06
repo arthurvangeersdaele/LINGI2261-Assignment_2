@@ -133,9 +133,9 @@ class State:
 
         if target_place_reached and self.remaining_targets > 0:
             successor = State(new_grid, pos=new_positions, remaining_targets=self.remaining_targets - 1)
-            if (sys.gettrace() is not None) or (len(sys.argv) > 1 and sys.argv[1] in ['astar', 'bfs_graphs']):
-                from tabulate import tabulate
-                print(tabulate(np.array(new_grid)), "\n")
+            # if (sys.gettrace() is not None) or (len(sys.argv) > 1 and sys.argv[1] in ['astar', 'bfs_graphs']):
+            #     from tabulate import tabulate
+            #     print(tabulate(np.array(new_grid)), "\n")
         else:
             successor = State(new_grid, pos=new_positions, remaining_targets=self.remaining_targets)
 
@@ -172,7 +172,7 @@ class State:
         best = -1  # self.nbc
         for (row, col), block in self.positions.items():
             if block == target.lower() and row <= v_pos and ((best == -1) or abs(col - h_pos) < best):
-                best = abs(col - h_pos)
+                best = abs(col - h_pos) if abs(col - h_pos) > 0 else 2
         # for row in range(len(self.grid)):
         #     for col in range(len(self.grid[0])):
         #         if self.grid[row][col] == target.lower() and row <= v_pos and abs(col - h_pos) < best:
@@ -269,8 +269,8 @@ def local_run():
 
     for instance in [instances_path + name for name in instance_names]:
         grid_init, grid_goal = readInstanceFile(instance)
-        if instance != 'instances/a08':
-            continue
+        # if instance == 'instances/a05':
+        #     continue
         # global goal_state
         # goal_state = State(grid_goal, is_goal_state=True)
         # init_state = State(grid_init)
@@ -322,9 +322,9 @@ def local_run():
             path.reverse()
 
             print('Number of moves: ' + str(node.depth))
-            for n in path:
-                print(n.state)  # assuming that the __str__ function of state outputs the correct format
-                print()
+            # for n in path:
+            #     print(n.state)  # assuming that the __str__ function of state outputs the correct format
+            #     print()
             print("* Execution time:\t", str(execution_time))
             print("* Path cost to goal:\t", node.depth, "moves")
             print("* #Nodes explored:\t", nb_explored)
