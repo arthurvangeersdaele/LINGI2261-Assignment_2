@@ -1,5 +1,5 @@
 # -*-coding: utf-8 -*
-'''NAMES OF THE AUTHOR(S): Gaël Aglin <gael.aglin@uclouvain.be>'''
+"""NAMES OF THE AUTHOR(S): Gaël Aglin <gael.aglin@uclouvain.be>"""
 from search import *
 import sys
 import time
@@ -8,6 +8,7 @@ import multiprocessing
 
 goal_state = None
 max_score = -1
+
 
 #################
 # Problem class #
@@ -37,6 +38,28 @@ class Blocks(Problem):
 ###############
 # State class #
 ###############
+def apply_gravity_to_others(new_grid, new_positions, old_pos):
+    old_v_pos, old_h_pos = old_pos
+    target_places = goal_state.positions
+    for i in range(old_v_pos - 1, -1, -1):
+        if new_grid[i][old_h_pos] in [' ', '#', '@']:
+            break
+        else:
+            target_place_reached = False
+            if (i + 1, old_h_pos) in target_places and target_places[(i + 1, old_h_pos)] == (
+                    new_grid[i][old_h_pos]).upper():
+                new_grid[i + 1][old_h_pos] = '@'
+                target_place_reached = True
+            else:
+                new_grid[i + 1][old_h_pos] = new_grid[i][old_h_pos]
+            new_grid[i][old_h_pos] = ' '
+
+            if not target_place_reached:
+                new_positions[(i + 1, old_h_pos)] = new_positions[(i, old_h_pos)]
+            del new_positions[(i, old_h_pos)]
+    return
+
+
 class State:
     def __init__(self, grid, pos=None, remaining_targets=-1, is_goal_state=False):
         self.nbr = len(grid)
@@ -81,14 +104,17 @@ class State:
         i = 0
         # Check until if the block will fall
         if (move_v + 1) < self.nbr and self.grid[move_v + 1][move_h] == ' ':
-            while (move_v + 1 + i) < self.nbr and self.grid[move_v + 1 + i][move_h] == ' ':  # Find vertical position after the block has fallen
+            while (move_v + 1 + i) < self.nbr and self.grid[move_v + 1 + i][move_h] == ' ':
+                # Find vertical position after the block has fallen
                 i += 1
 
-        # CONDITION: (self.grid[8][5] == 'b' and self.grid[6][6] == 'b' and move_h == 5 and move_v == 6 and i == 1) or (self.grid[8][3] == 'a' and self.grid[6][3] == 'a' and move_h == 3 and move_v == 3 and i == 1) or self.grid[7][3] == '@' or self.grid[7][5] == '@'
-        # Updating new_grid with new_pos of block
+        # CONDITION: (self.grid[8][5] == 'b' and self.grid[6][6] == 'b' and move_h == 5 and move_v == 6 and i == 1)
+        # or (self.grid[8][3] == 'a' and self.grid[6][3] == 'a' and move_h == 3 and move_v == 3 and i == 1) or
+        # self.grid[7][3] == '@' or self.grid[7][5] == '@' Updating new_grid with new_pos of block
         target_places = goal_state.positions
         target_place_reached = False
-        if (move_v + i, move_h) in target_places and target_places[(move_v + i, move_h)] == (new_grid[old_v][old_h]).upper():
+        if (move_v + i, move_h) in target_places and target_places[(move_v + i, move_h)] == (
+                new_grid[old_v][old_h]).upper():
             new_grid[move_v + i][move_h] = '@'
             target_place_reached = True
         else:
@@ -101,7 +127,7 @@ class State:
         del new_positions[old_pos]
 
         # Applying gravity to make potential block on top of old_pos fall ...
-        self.apply_gravity_to_others(new_grid, new_positions, old_pos)
+        apply_gravity_to_others(new_grid, new_positions, old_pos)
 
         # Generating the successor
 
@@ -114,27 +140,6 @@ class State:
             successor = State(new_grid, pos=new_positions, remaining_targets=self.remaining_targets)
 
         return successor
-
-
-    def apply_gravity_to_others(self, new_grid, new_positions, old_pos):
-        old_v_pos, old_h_pos = old_pos
-        target_places = goal_state.positions
-        for i in range(old_v_pos - 1, -1, -1):
-            if new_grid[i][old_h_pos] in [' ', '#', '@']:
-                break
-            else:
-                target_place_reached = False
-                if (i+1, old_h_pos) in target_places and target_places[(i+1, old_h_pos)] == (new_grid[i][old_h_pos]).upper():
-                    new_grid[i + 1][old_h_pos] = '@'
-                    target_place_reached = True
-                else:
-                    new_grid[i+1][old_h_pos] = new_grid[i][old_h_pos]
-                new_grid[i][old_h_pos] = ' '
-
-                if not target_place_reached:
-                    new_positions[(i+1, old_h_pos)] = new_positions[(i, old_h_pos)]
-                del new_positions[(i, old_h_pos)]
-        return
 
     def goal_state_get_remaining_targets(self):
         counter = 0
@@ -258,7 +263,8 @@ def local_run():
 
     instances_path = "instances/"
     instance_names = ['a01', 'a02', 'a03', 'a04', 'a05', 'a06', 'a07', 'a08', 'a09', 'a10']
-    headers = ['Instance', 'Timeout?', 'Number of moves', 'Execution time', 'Path cost to goal', '#Nodes explored', 'Queue size at goal']
+    headers = ['Instance', 'Timeout?', 'Number of moves', 'Execution time', 'Path cost to goal', '#Nodes explored',
+               'Queue size at goal']
     content = []
 
     for instance in [instances_path + name for name in instance_names]:
@@ -293,7 +299,8 @@ def local_run():
 
         if len(sys.argv) > 1:
             if sys.argv[1] == 'astar':
-                p = multiprocessing.Process(target=run_in_proc, args=(instance, (grid_init, grid_goal), q_multi_proc, heuristic))
+                p = multiprocessing.Process(target=run_in_proc,
+                                            args=(instance, (grid_init, grid_goal), q_multi_proc, heuristic))
             elif sys.argv[1] == 'bfs_graph':
                 p = multiprocessing.Process(target=run_in_proc, args=(instance, (grid_init, grid_goal), q_multi_proc))
             else:
@@ -322,11 +329,13 @@ def local_run():
             print("* Path cost to goal:\t", node.depth, "moves")
             print("* #Nodes explored:\t", nb_explored)
             print("* Queue size at goal:\t", remaining_nodes)
-            content.append([str(instance), 'NO', str(node.depth), str(execution_time), str(node.depth), str(nb_explored), str(remaining_nodes)])
+            content.append(
+                [str(instance), 'NO', str(node.depth), str(execution_time), str(node.depth), str(nb_explored),
+                 str(remaining_nodes)])
         else:
             print('Instance', instance, "timed out after", str(timeout) + "s")
             content.append(
-                [str(instance), 'YES', '/', '> '+str(timeout)+'s', '/', '/',
+                [str(instance), 'YES', '/', '> ' + str(timeout) + 's', '/', '/',
                  '/'])
     from tabulate import tabulate
     print(tabulate(content, headers=headers))
@@ -345,12 +354,12 @@ def INGInious_run(search='astar'):
     problem = Blocks(init_state)
 
     # example of bfs graph search
-    startTime = time.perf_counter()
+    start_time = time.perf_counter()
     if search == 'astar':
         node, nb_explored, remaining_nodes = astar_graph_search(problem, heuristic)
     else:
         node, nb_explored, remaining_nodes = breadth_first_graph_search(problem)
-    endTime = time.perf_counter()
+    end_time = time.perf_counter()
 
     # example of print
     path = node.path()
@@ -360,10 +369,10 @@ def INGInious_run(search='astar'):
     for n in path:
         print(n.state)  # assuming that the __str__ function of state outputs the correct format
         print()
-    print("* Execution time:\t", str(endTime - startTime))
+    print("* Execution time:\t", str(end_time - start_time))
     print("* Path cost to goal:\t", node.depth, "moves")
     print("* #Nodes explored:\t", nb_explored)
-    print("* Queue size at goal:\t",  remaining_nodes)
+    print("* Queue size at goal:\t", remaining_nodes)
 
 
 if __name__ == '__main__':
