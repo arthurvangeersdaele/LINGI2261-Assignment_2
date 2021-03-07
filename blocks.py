@@ -293,7 +293,7 @@ def local_run():
         #     node, nb_explored, remaining_nodes = depth_first_graph_search(problem)
         # endTime = time.perf_counter()
         if sys.gettrace() is None:
-            timeout = 75  # in SECONDS
+            timeout = 120  # in SECONDS
         else:
             timeout = 3600 * 24
 
