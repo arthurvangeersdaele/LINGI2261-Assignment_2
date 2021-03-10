@@ -178,7 +178,12 @@ class State:
         best = -1  # self.nbc
         for (row, col), block in self.positions.items():
             if block == target.lower() and row <= v_pos and ((best == -1) or abs(col - h_pos) < best):
-                best = abs(col - h_pos) if abs(col - h_pos) > 0 else 2
+                if abs(col - h_pos) > 0:
+                    best = abs(col - h_pos)  # if abs(col - h_pos) > 0 else 2
+                elif best == -1:
+                    best = 1
+                else:
+                    continue
         # for row in range(len(self.grid)):
         #     for col in range(len(self.grid[0])):
         #         if self.grid[row][col] == target.lower() and row <= v_pos and abs(col - h_pos) < best:
@@ -275,7 +280,7 @@ def local_run():
 
     for instance in [instances_path + name for name in instance_names]:
         grid_init, grid_goal = readInstanceFile(instance)
-        if instance != 'instances/a05':
+        if instance == 'instances/a05':
             continue
         # global goal_state
         # goal_state = State(grid_goal, is_goal_state=True)
@@ -299,7 +304,7 @@ def local_run():
         #     node, nb_explored, remaining_nodes = depth_first_graph_search(problem)
         # endTime = time.perf_counter()
         if sys.gettrace() is None:
-            timeout = 120  # in SECONDS
+            timeout = 75  # in SECONDS
         else:
             timeout = 3600 * 24
 
