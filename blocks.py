@@ -3,7 +3,7 @@
 from search import *
 import sys
 import time
-import numpy as np
+#import numpy as np
 import multiprocessing
 
 goal_state = None
@@ -25,10 +25,12 @@ class Blocks(Problem):
                 continue
             if (h_pos + 1 < state.nbc) and state.grid[v_pos][h_pos + 1] == ' ':  # can move to the right
                 suc = state.get_successor(position, (v_pos, h_pos + 1))
-                successors.append(("right", suc))
+                if suc is not None:
+                    successors.append(("right", suc))
             if (h_pos - 1 >= 0) and state.grid[v_pos][h_pos - 1] == ' ':  # can move to the left
                 suc = state.get_successor(position, (v_pos, h_pos - 1))
-                successors.append(("left", suc))
+                if suc is not None:
+                    successors.append(("left", suc))
         return successors
 
     def goal_test(self, state):
@@ -139,7 +141,7 @@ class State:
         else:
             successor = State(new_grid, pos=new_positions, remaining_targets=self.remaining_targets)
 
-        return successor
+        return successor if successor.get_score() != -1 else None
 
     def goal_state_get_remaining_targets(self):
         counter = 0
@@ -157,6 +159,10 @@ class State:
     #             counter -= 1
     #     return counter
 
+    def get_heuristic_score(self):
+        tmp = self.get_score()
+        return tmp if tmp != -1 else max_score
+
     def get_score(self):
         score = 0
         for position, block in goal_state.positions.items():
@@ -164,7 +170,7 @@ class State:
             if self.grid[v_pos][h_pos] != '@':
                 dist = self.get_closest_block_distance(block, h_pos, v_pos)
                 if dist == -1:
-                    return max_score
+                    return -1
                 score += dist
         return score
 
@@ -219,7 +225,7 @@ def readInstanceFile(filename):
 def heuristic(node):
     # h = 0.0
     state = node.state
-    h = float(state.get_score())
+    h = float(state.get_heuristic_score())
     # ...
     # compute an heuristic value
     # ...
@@ -269,8 +275,8 @@ def local_run():
 
     for instance in [instances_path + name for name in instance_names]:
         grid_init, grid_goal = readInstanceFile(instance)
-        # if instance == 'instances/a05':
-        #     continue
+        if instance != 'instances/a05':
+            continue
         # global goal_state
         # goal_state = State(grid_goal, is_goal_state=True)
         # init_state = State(grid_init)

@@ -4,3 +4,7 @@
 .run/
 
 __pycache__/
+
+astar_out.txt
+
+bfs_graph_out.txt
